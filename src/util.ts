@@ -258,7 +258,7 @@ export async function evaluate<T>(
   if (result && result.exceptionDetails) {
     throw new Error(
       result.exceptionDetails.exception.value ||
-        result.exceptionDetails.exception.description,
+      result.exceptionDetails.exception.description,
     )
   }
 
@@ -676,12 +676,16 @@ const s3ContentTypes = {
 export async function uploadToS3(
   data: string,
   contentType: string,
+  imageName: string,
 ): Promise<string> {
   const s3ContentType = s3ContentTypes[contentType]
   if (!s3ContentType) {
     throw new Error(`Unknown S3 Content type ${contentType}`)
   }
-  const s3Path = `${getS3ObjectKeyPrefix()}${cuid()}.${s3ContentType.extension}`
+
+  const s3Prefix = imageName || `${getS3ObjectKeyPrefix()}`
+  const s3Path = `${s3Prefix}.${s3ContentType.extension}`
+
   const s3 = new AWS.S3()
   await s3
     .putObject({
